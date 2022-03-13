@@ -93,7 +93,7 @@ const Home = () => {
         <div className='right'>
           <div className='overlay'></div>
           <div className='b-image img contain'>
-            <img src={bannerImg} alt="banner image"/>
+            <img src={bannerImg} alt="banner"/>
           </div>
         </div>
       </div>
