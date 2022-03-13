@@ -25,11 +25,11 @@ body{
 }
 
 .img.contain>img{
-    object-position: contain;
+    object-fit: contain;
 }
 
 .img.cover>img{
-    object-position: cover;
+    object-fit: cover;
 }
 
 h1{
@@ -75,7 +75,8 @@ h6{
 }
 
 @media only screen and (max-width: 600px){
-    body{
-        font-size: 12px;
+   
+    .container{
+        padding: 0 30px;
     }
 }

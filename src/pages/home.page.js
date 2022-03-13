@@ -9,6 +9,8 @@ const Styles = styled.div`
     justify-content:space-between;
     align-items:Center;
     height:calc( 100vh - 70px );
+    position:relative;
+    overflow:hidden;
   }
   &>.container>.left{
     h1{
@@ -20,10 +22,53 @@ const Styles = styled.div`
       margin-bottom:1.4rem;
       font-size:1.1em;
     }
+    z-index:2;
   }
   &>.container>.right{
     .b-image{
       height:calc(90vh - 70px);
+      img{
+        object-fit:contain;
+      }
+    }
+  }
+  @media screen and (max-width:600px){
+    &>.container{
+      height:auto;
+      padding-top:80px;
+      padding-bottom:80px;
+    }
+    &>.container>.left{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:Center;
+      h1{
+        font-size:2.5em;
+      }
+      .btn{
+        font-size:18px;
+      }
+    }
+    .overlay{
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:1;
+      background:#ffffff95;
+    }
+    .b-image{
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:0;
+      img{
+        object-position:center top;
+      }
     }
   }
 `
@@ -41,6 +86,7 @@ const Home = () => {
             <Button color={BLUE} looks={BTN_FILL}>Get Started</Button>
         </div>
         <div className='right'>
+          <div className='overlay'></div>
           <div className='b-image img contain'>
             <img src={bannerImg} alt="banner image"/>
           </div>
