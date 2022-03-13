@@ -2,7 +2,6 @@
 import React from 'react'
 import Layout from './components/layout/layout.components'
 import {
-  BrowserRouter,
   Routes,
   Route,
 } from "react-router-dom";
