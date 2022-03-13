@@ -25,6 +25,7 @@ const Styles = styled.div`
     z-index:2;
   }
   &>.container>.right{
+    max-width:50%;
     .b-image{
       height:calc(90vh - 70px);
       img{
@@ -34,9 +35,8 @@ const Styles = styled.div`
   }
   @media screen and (max-width:600px){
     &>.container{
-      height:auto;
-      padding-top:80px;
-      padding-bottom:80px;
+      justify-content:center;
+      align-items:center;
     }
     &>.container>.left{
       display:flex;
@@ -50,26 +50,31 @@ const Styles = styled.div`
         font-size:18px;
       }
     }
-    .overlay{
-      position:absolute;
-      top:0;
-      left:0;
-      right:0;
-      bottom:0;
-      z-index:1;
-      background:#ffffff95;
-    }
-    .b-image{
-      position:absolute;
-      top:0;
-      left:0;
-      right:0;
-      bottom:0;
-      z-index:0;
-      img{
-        object-position:center top;
+    &>.container>.right{
+      max-width:100%;
+      .overlay{
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        z-index:1;
+        background:#ffffff95;
+      }
+      .b-image{
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        z-index:0;
+        img{
+          object-position:right center;
+          object-fit:cover;
+        }
       }
     }
+
   }
 `
 const Home = () => {

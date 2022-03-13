@@ -25,7 +25,6 @@ nav>.container{
   height:70px;
   .menu-btn{
     font-size:1.3em;
-    margin-right:1rem;
     cursor:pointer;
     display:none;
   }
@@ -41,7 +40,7 @@ nav>.container{
   }
   & .right-nav{
     justify-content:end;
-    &>.btn-cont{
+    & .btn-cont{
       margin-left:1rem;
     }
     #login-btn .btn:hover{
@@ -65,21 +64,36 @@ nav>.container{
     .nav-menu{
       display:none;
     }
+    .right-nav .sign-btns{
+      display:none;
+    }
     .menu-btn{
       display:inline-block;
     }
   }
 }
+.menu-overlay{
+  position:fixed;
+  top:0;
+  right:0;
+  left:0;
+  bottom:0;
+  width:100%;
+  z-index:1002;
+  background:#000000bb;
+}
 .mobile-menu{
   position:fixed;
-  z-index:1001;
+  top:0;
+  right:0;
+  z-index:1003;
   background:white;
   height:100vh;
-  min-width:200px;
+  width:200px;
   border-right:1px solid #f1f1f1;
   padding:40px 30px;
   transition:0.3s ease;
-  transform:translateX(${({isOpen})=>isOpen?"0px":"-100%"});
+  transform:translateX(${({isOpen})=>isOpen?"0px":"100%"});
   .cross-cont{
     display:inline-block;
     cursor:pointer;
@@ -91,7 +105,10 @@ nav>.container{
   h4{
     margin-bottom:1rem
   }
-  .menu{
+  hr{
+    margin:20px 0;
+  }
+  .menu,.menu-2{
     list-style-type:none;
     &>li {
       margin-bottom:0.5rem;
@@ -101,6 +118,7 @@ nav>.container{
       }
     }
   }
+  
 }
 `;
 
@@ -111,9 +129,6 @@ const Header = () => {
         <nav>
           <div className='container'>
             <div className='left-nav'>
-              <div className='menu-btn' onClick={()=>setOpen((temp)=>!temp)}>
-                <FontAwesomeIcon icon={faBars} />
-              </div>
               <div className="img contain" id="logo">
                 <img src={logo} alt="carsome logo"/>
               </div>
@@ -133,18 +148,25 @@ const Header = () => {
               </ul>
             </div>
             <div className="right-nav">
-              <Button looks={BTN_TRANS} color={BLACK} id="login-btn">Login</Button>
-              <Button looks={BTN_BORDER} color={BLACK} id="signup-btn">Sign up</Button>
+              <div className='sign-btns'>
+                <Button looks={BTN_TRANS} color={BLACK} id="login-btn">Login</Button>
+                <Button looks={BTN_BORDER} color={BLACK} id="signup-btn">Sign up</Button>
+              </div>
+              <div className='menu-btn' onClick={()=>setOpen((temp)=>!temp)}>
+                <FontAwesomeIcon icon={faBars} />
+              </div>
             </div>
           </div>
         </nav>
+        {
+          isOpen&&<div className='menu-overlay'></div>
+        }
+
         <div className='mobile-menu'>
+
           <div className='cross-cont' onClick={()=>setOpen(false)}>
             <FontAwesomeIcon icon={faXmark} />
           </div>
-          <h4>
-            MENU
-          </h4>
           <ul className="menu">
                   <li>
                     <Button to="/" looks={BTN_TRANS} color={BLACK}>Home</Button>
@@ -158,6 +180,16 @@ const Header = () => {
                   <li>
                     <Button to="/menu-3" looks={BTN_TRANS} color={BLACK}>Menu 3</Button>
                   </li>
+          </ul>
+          <hr/>
+          <ul className="menu-2">
+                  <li>
+                    <Button looks={BTN_TRANS} color={BLACK}>Login</Button>
+                  </li>
+                  <li>
+                    <Button looks={BTN_TRANS} color={BLACK}>signup</Button>
+                  </li>
+                  
           </ul>
         </div>
         <div className='nav-dummy'></div>
