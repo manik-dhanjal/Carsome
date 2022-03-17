@@ -2,18 +2,34 @@ import React,{useState,useEffect} from 'react'
 import styled from "styled-components"
 import Input from './input.components'
 import Button from './button.components'
-
+import tick from "../assets/images/tick.png"
 const Style = styled.div`
 border:1px solid #E0E0E0;
 min-width:10rem;
 padding:1.5rem 1.5rem;
 border-radius:1.2rem;
 box-shadow: 0px 4px 4px 0px #00000040;
->form{
+&>form{
     display:flex;
     justify-content:center;
     align-items:Center;
     flex-direction:column;
+    .commision-info{
+        width:100%;
+        margin-bottom:1rem;
+        display:flex;
+        justify-content:start;
+        align-items:Center;
+        .icon{
+            width:1em;
+            padding-top:0.28em;
+            margin-right:0.2rem;
+        }
+        .text{
+            font-size:0.8em;
+            width:100%;
+        }
+    }
 }
 .c-input{
     margin-bottom:1rem;
@@ -107,6 +123,14 @@ const LinkCreator = () => {
       <Style className='link-creator' isCopied={linkData.gen.isCopied}>
           <form onSubmit={handleSubmit}>
             <Input placeholder="https://www.carsome.com/buy-car/cp02020202" onChange={handleChange} value={linkData.link} name="link" required/>
+            <div className="commision-info">
+                <span className='icon img contain'>
+                    <img src={tick} alt="tick icon"/>
+                </span>
+                <span className='text'>
+                    commission available - RM500 per test drive
+                </span>
+            </div>
             <Input placeholder="Refrence 1" onChange={handleChange} value={linkData.ref1} name="ref1" required/>
             <Input placeholder="Refrence 2" onChange={handleChange} value={linkData.ref2} name="ref2" required/>
             <Button type="submit">Create Link</Button>
@@ -115,7 +139,6 @@ const LinkCreator = () => {
             linkData.gen.link&&
             (
               <div className='copy-text' onClick={copyText} >
-                {/* <input value={linkData.gen.link} disabled onClick={copyText}/> */}
                 <div className='text-to-copy'>
                     {linkData.gen.link}
                 </div>

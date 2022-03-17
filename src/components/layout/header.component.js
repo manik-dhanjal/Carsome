@@ -1,11 +1,16 @@
 import React from 'react'
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import styled from 'styled-components'
 import logo from "../../assets/images/Logo.png"
 import Button from '../button.components';
 import { BLACK, BTN_BORDER, BTN_TRANS } from '../../constants/style.contstants'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars,faXmark } from '@fortawesome/free-solid-svg-icons'
+import Auth from '../auth.component';
+import { UserContext } from '../../context/user.context';
+import { signOut } from 'firebase/auth';
+import { signOutUser } from '../../utils/firebase.utils';
+
 const Style = styled.header`
 nav{
   position:fixed;
@@ -124,6 +129,20 @@ nav>.container{
 
 const Header = () => {
   const [isOpen,setOpen] = useState(false);
+  const [isAuthOpen,setIsAuthOpen] = useState({
+    state:false,
+    signIn:false
+  })
+  const {currentUser} = useContext(UserContext);
+  const handleAuthOpenForSignIn = (res) => {
+      setIsAuthOpen({
+        state:true,
+        signIn:res
+      })
+  }
+  const signOutHandler = async () => {
+    await signOutUser();
+  }
   return (
     <Style isOpen={isOpen}>
         <nav>
@@ -132,25 +151,34 @@ const Header = () => {
               <div className="img contain" id="logo">
                 <img src={logo} alt="carsome logo"/>
               </div>
-              <ul className="nav-menu">
-                <li>
-                  <Button to="/" looks={BTN_TRANS} color={BLACK}>Home</Button>
-                </li>
-                <li>
-                  <Button to="/dashboard" looks={BTN_TRANS} color={BLACK}>Menu 1</Button>
-                </li>
-                <li>
-                  <Button to="/menu-2" looks={BTN_TRANS} color={BLACK}>Menu 2</Button>
-                </li>
-                <li>
-                  <Button to="/menu-3" looks={BTN_TRANS} color={BLACK}>Menu 3</Button>
-                </li>
-              </ul>
+              {
+                currentUser&&(
+                  <ul className="nav-menu">
+                    <li>
+                      <Button to="/" looks={BTN_TRANS} color={BLACK}>Home</Button>
+                    </li>
+                    <li>
+                      <Button to="/dashboard" looks={BTN_TRANS} color={BLACK}>Dashboard</Button>
+                    </li>
+                  </ul>
+                )
+              }
+
             </div>
             <div className="right-nav">
               <div className='sign-btns'>
-                <Button looks={BTN_TRANS} color={BLACK} id="login-btn">Login</Button>
-                <Button looks={BTN_BORDER} color={BLACK} id="signup-btn">Sign up</Button>
+                {
+                  currentUser?
+                  (
+                    <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler}>Sign out</Button>  
+                  ):(
+                    <>
+                      <Button looks={BTN_TRANS} color={BLACK} id="login-btn" onClick={()=> handleAuthOpenForSignIn(true)}>Login</Button>
+                      <Button looks={BTN_BORDER} color={BLACK} id="signup-btn" onClick={()=> handleAuthOpenForSignIn(false)}>Sign up</Button>
+                    </>
+                  )
+                }
+
               </div>
               <div className='menu-btn' onClick={()=>setOpen((temp)=>!temp)}>
                 <FontAwesomeIcon icon={faBars} />
@@ -184,14 +212,15 @@ const Header = () => {
           <hr/>
           <ul className="menu-2">
                   <li>
-                    <Button looks={BTN_TRANS} color={BLACK}>Login</Button>
+                    <Button looks={BTN_TRANS} color={BLACK} onClick={()=> handleAuthOpenForSignIn(true)}>Login</Button>
                   </li>
                   <li>
-                    <Button looks={BTN_TRANS} color={BLACK}>signup</Button>
+                    <Button looks={BTN_TRANS} color={BLACK} onClick={()=> handleAuthOpenForSignIn(false)}>signup</Button>
                   </li>
                   
           </ul>
         </div>
+        <Auth open={isAuthOpen.state} isSignIn={isAuthOpen.signIn} onClose={() => setIsAuthOpen(false)}/>
         <div className='nav-dummy'></div>
     </Style>
   )
