@@ -137,7 +137,7 @@ const Header = () => {
                   <Button to="/" looks={BTN_TRANS} color={BLACK}>Home</Button>
                 </li>
                 <li>
-                  <Button to="/menu-1" looks={BTN_TRANS} color={BLACK}>Menu 1</Button>
+                  <Button to="/dashboard" looks={BTN_TRANS} color={BLACK}>Menu 1</Button>
                 </li>
                 <li>
                   <Button to="/menu-2" looks={BTN_TRANS} color={BLACK}>Menu 2</Button>
