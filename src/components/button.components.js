@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from "styled-components"
 import { Link } from 'react-router-dom'
-import { BLUE,L_BLUE, BLACK, WHITE,BTN_BORDER,BTN_FILL,BTN_TRANS } from '../constants/style.contstants'
-
+import { BLUE,L_BLUE, BLACK, WHITE, BTN_BORDER,BTN_FILL,BTN_TRANS } from '../constants/style.contstants'
+import Spinner from './loading-spinner.component'
 
 
 const Style = styled.div`
@@ -11,9 +11,16 @@ display:inline-block;
     display:inline-block;
     text-decoration:none;
     padding:0.5em 1.5em;
-    cursor:pointer;
     font-size:1em;
-    ${({looks=BTN_FILL,color=BLUE,active=false})=>{
+    position:relative;
+    overflow:hidden;
+    ${
+        ({isLoading})=>
+        !isLoading&&`
+            cursor:pointer;
+        `
+    }
+    ${({looks=BTN_FILL,color=BLUE,active=false,isLoading})=>{
         switch(looks){
             case BTN_BORDER: return `
                 border:1px solid ${color};
@@ -21,9 +28,13 @@ display:inline-block;
                 background:transparent;
                 border-radius:100px;
                 transition:0.3s ease;
-                &:hover{
-                    background:${color};
-                    color:${color===WHITE?BLUE:WHITE};
+                ${
+                   !isLoading&&`
+                        &:hover{
+                            background:${color};
+                            color:${color===WHITE?BLUE:WHITE};
+                        }
+                    `
                 }
                 ${
                     active&&
@@ -36,8 +47,12 @@ display:inline-block;
                 color:${color};
                 background:transparent;
                 transition:0.3s ease;
-                &:hover{
-                    color:${color===L_BLUE?BLUE:L_BLUE}
+                ${
+                    !isLoading&&`
+                        &:hover{
+                            color:${color===L_BLUE?BLUE:L_BLUE}
+                        }
+                    `
                 }
                 ${
                     active&&
@@ -50,9 +65,13 @@ display:inline-block;
                 background:${color};
                 border-radius:100px;
                 transition:0.3s ease;
-                &:hover{
-                    background:transparent;
-                    color:${color};
+                ${
+                    !isLoading&&`
+                        &:hover{
+                            background:transparent;
+                            color:${color};
+                        }
+                    `
                 }
                 ${
                     active&&
@@ -65,25 +84,29 @@ display:inline-block;
     }}
 }
 `
-const Button = ({children,to="",href="",looks,color,active,className,id,...props}) => {
+const Button = ({children,to="",href="",looks,color,active,className,id,isLoading=false,...props}) => {
     if(href||to){
         return(
-            <Style looks={looks} color={color} active={active} className={"btn-cont "+className} id={id}>
+            <Style looks={looks} color={color} active={active} className={"btn-cont "+(className||null)+(isLoading?" disbaled":"enabled")} id={id} isLoading={isLoading}>
                 {
                     to?
                         <Link to={to} {...props} className="btn">
+                            { isLoading && <Spinner size={20}/> }
                             {children}
                         </Link>
                         :<a href={href} {...props} className="btn">
-                            {children}
+                           { isLoading && <Spinner size={20}/> }
+                           {children}
                         </a>
                 }
             </Style>
         )
     }
   return (
-    <Style looks={looks} color={color} active={active} className={"btn-cont "+className} id={id}>
-        <button {...props} className="btn">
+    <Style looks={looks} color={color} active={active} className={"btn-cont "+(className||null)+(isLoading?" disbaled":"enabled")} id={id} isLoading={isLoading}>
+        <button {...props} className="btn" disabled={isLoading}>
+
+            { isLoading && <Spinner size={20}/> }
             {children}
         </button>
     </Style>

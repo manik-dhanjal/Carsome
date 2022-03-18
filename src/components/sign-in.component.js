@@ -1,10 +1,10 @@
-import React,{useState, useContext} from 'react'
+import React,{useState} from 'react'
 import styled from "styled-components"
 import Button from './button.components'
 import Input from './input.components'
-import { signInAuthUserWithEmailAndPassword, createUserDocumentFromAuth,signInWithGooglePopup } from '../utils/firebase.utils'
+import { signInAuthUserWithEmailAndPassword, signInWithGooglePopup } from '../utils/firebase.utils'
 import { BLACK } from '../constants/style.contstants'
-import { UserContext } from '../context/user.context'
+import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../constants/transaction.constants'
 
 const Styles = styled.div`
 .c-input{
@@ -26,8 +26,13 @@ const defaultFormFields = {
     email:'',
     password:'',
 }
+
 const SignIn = ({closeNow}) => {
   const [formFields,setFormFields] = useState(defaultFormFields);
+  const [googleAuthRequest, setGoogleAuthRequest] = useState( REQUEST_SUCCESS() );
+  const [CredAuthRequest, setCredAuthRequest] = useState( REQUEST_SUCCESS() );
+
+
   const {email,password} = formFields;
 
   const resetFormFields = () => {
@@ -37,8 +42,12 @@ const SignIn = ({closeNow}) => {
     event.preventDefault();
    
     try{
+        setCredAuthRequest( REQUEST_PENDING() );
+
         const {user} = await signInAuthUserWithEmailAndPassword(email,password);
         resetFormFields();
+
+        setCredAuthRequest( REQUEST_SUCCESS() );
     }catch(error){
         const errorCodeMsg = {
             'auth/weak-password':"Password should be at least 6 characters.",
@@ -46,6 +55,7 @@ const SignIn = ({closeNow}) => {
             'auth/wrong-password':"Incorrect password",
             'auth/user-not-found':"Email not found"
         }
+        setCredAuthRequest( REQUEST_FAILED( errorCodeMsg[error.code]||"error faced while signing in" ) );
         alert(errorCodeMsg[error.code]||"error faced while signing in");
         console.log('user creation encountered error',error.message);
     }
@@ -61,18 +71,25 @@ const SignIn = ({closeNow}) => {
     })
   }
   const logGoogleUser = async () => {
+      try{
+        setGoogleAuthRequest( REQUEST_PENDING() );
         await signInWithGooglePopup();
+        setGoogleAuthRequest( REQUEST_SUCCESS() );
         closeNow();
+      }
+      catch(e){
+        setGoogleAuthRequest( REQUEST_FAILED(e.message) );
+      }
 }
   return (
     <Styles>
         <form onSubmit = {handleSubmit}>
             <Input value={email} type="email" name="email" placeholder="E mail" required onChange={handleChange}/>
             <Input value={password} type="password" name="password" placeholder="Password" required onChange={handleChange}/>
-            <Button type="submit" color={BLACK}>Log in</Button>
+            <Button type="submit" color={BLACK} isLoading={ CredAuthRequest.status === PENDING }>Log in</Button>
         </form>
         <div style={{textAlign:"center"}} className="or-div">or</div>
-        <Button onClick={logGoogleUser}>Log in with Google</Button>
+        <Button onClick={logGoogleUser} isLoading={ googleAuthRequest.status === PENDING }>Log in with Google</Button>
     </Styles>
   )
 }

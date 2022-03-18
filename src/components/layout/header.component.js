@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars,faXmark } from '@fortawesome/free-solid-svg-icons'
 import Auth from '../auth.component';
 import { UserContext } from '../../context/user.context';
-import { signOut } from 'firebase/auth';
 import { signOutUser } from '../../utils/firebase.utils';
+import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../../constants/transaction.constants';
 
 const Style = styled.header`
 nav{
@@ -133,6 +133,7 @@ const Header = () => {
     state:false,
     signIn:false
   })
+  const [signOutRequest,setSignOutRequest] = useState(REQUEST_SUCCESS());
   const {currentUser} = useContext(UserContext);
   const handleAuthOpenForSignIn = (res) => {
       setIsAuthOpen({
@@ -141,7 +142,15 @@ const Header = () => {
       })
   }
   const signOutHandler = async () => {
-    await signOutUser();
+    try{
+      setSignOutRequest( REQUEST_PENDING() );
+      await signOutUser();
+      setSignOutRequest( REQUEST_SUCCESS() );
+    }
+    catch(e){
+      setSignOutRequest( REQUEST_FAILED(e.message) )
+      console.log(e.message)
+    }
   }
   return (
     <Style isOpen={isOpen}>
@@ -170,7 +179,7 @@ const Header = () => {
                 {
                   currentUser?
                   (
-                    <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler}>Sign out</Button>  
+                    <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={signOutRequest.status === PENDING}>Sign out</Button>  
                   ):(
                     <>
                       <Button looks={BTN_TRANS} color={BLACK} id="login-btn" onClick={()=> handleAuthOpenForSignIn(true)}>Login</Button>
@@ -211,12 +220,23 @@ const Header = () => {
           </ul>
           <hr/>
           <ul className="menu-2">
-                  <li>
-                    <Button looks={BTN_TRANS} color={BLACK} onClick={()=> handleAuthOpenForSignIn(true)}>Login</Button>
-                  </li>
-                  <li>
-                    <Button looks={BTN_TRANS} color={BLACK} onClick={()=> handleAuthOpenForSignIn(false)}>signup</Button>
-                  </li>
+                {
+                  currentUser?
+                  (
+                    <li>
+                      <Button looks={BTN_TRANS} color={BLACK} onClick={signOutHandler} isLoading={signOutRequest.status === PENDING}>Sign out</Button>  
+                    </li>
+                  ):(
+                    <>
+                        <li>
+                          <Button looks={BTN_TRANS} color={BLACK} onClick={()=> handleAuthOpenForSignIn(true)}>Login</Button>
+                        </li>
+                        <li>
+                          <Button looks={BTN_TRANS} color={BLACK} onClick={()=> handleAuthOpenForSignIn(false)}>signup</Button>
+                        </li>
+                    </>
+                  )
+                }
                   
           </ul>
         </div>

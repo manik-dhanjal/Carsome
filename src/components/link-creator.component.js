@@ -1,8 +1,10 @@
-import React,{useState,useEffect} from 'react'
+import React,{useState,useContext} from 'react'
 import styled from "styled-components"
 import Input from './input.components'
 import Button from './button.components'
 import tick from "../assets/images/tick.png"
+import { UserContext } from '../context/user.context'
+
 const Style = styled.div`
 border:1px solid #E0E0E0;
 min-width:10rem;
@@ -51,6 +53,8 @@ box-shadow: 0px 4px 4px 0px #00000040;
     width:100%;
     .text-to-copy{
         font-size:0.8em;
+        white-space:nowrap;
+        overflow:hidden;
     }
     .indicator{
         white-space:nowrap;
@@ -61,6 +65,7 @@ box-shadow: 0px 4px 4px 0px #00000040;
         }};
         padding:0.3em 0.5em;
         border-radius:0.1em;
+        margin-left:5px;
     }
 }
 `
@@ -79,6 +84,7 @@ const LinkCreator = () => {
 
         }
     )
+    const { currentUser } = useContext(UserContext)
     const handleChange = (e) => {
         e.preventDefault();
         setLinkData((prev)=>{
@@ -94,12 +100,18 @@ const LinkCreator = () => {
     }
     const handleSubmit = (e) => {
         e.preventDefault();
+        const {link,ref1,ref2} = linkData.raw;
+        if(!link || link.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?carsome.my/igm)){
+            alert("please enter valid link");
+        }
+        const generatedLink = `${link}?utm_source=${encodeURIComponent(currentUser.uid)}&utm_content=${encodeURIComponent(ref1)}_${encodeURIComponent(ref2)}`;
+
         setLinkData((prev)=>{
             return {
                 ...prev,
                 gen:{
                     isCopied:false,
-                    link:prev.raw.link
+                    link:generatedLink
                 }
 
             }
@@ -119,6 +131,7 @@ const LinkCreator = () => {
             }
         })
     }
+  if(!currentUser) return;
   return (
       <Style className='link-creator' isCopied={linkData.gen.isCopied}>
           <form onSubmit={handleSubmit}>
