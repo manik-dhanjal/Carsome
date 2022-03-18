@@ -44,7 +44,7 @@ const SignIn = ({closeNow}) => {
     try{
         setCredAuthRequest( REQUEST_PENDING() );
 
-        const {user} = await signInAuthUserWithEmailAndPassword(email,password);
+        await signInAuthUserWithEmailAndPassword(email,password);
         resetFormFields();
 
         setCredAuthRequest( REQUEST_SUCCESS() );

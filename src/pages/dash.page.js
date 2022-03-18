@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from "styled-components";
 import DataCards from '../components/data-cards.components';
-import Input from '../components/input.components';
 import Table from '../components/table.component';
 import { LINK_STATS } from '../constants/table-schema.constants';
 import LinkCreator from '../components/link-creator.component';

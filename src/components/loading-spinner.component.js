@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from "styled-components"
-import { BLACK, BLUE, L_BLUE } from '../constants/style.contstants'
+import { BLUE, L_BLUE } from '../constants/style.contstants'
 
 const Styles = styled.div`
 position:absolute;

@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react'
+import React from 'react'
 import styled from "styled-components"
 
 const Style = styled.div`
@@ -47,21 +47,21 @@ const sampleSchema = [
         id:"clicks3"
     }
 ]
-const sampleData = [
-    {
-        clicks:"1233",
-        clicks2:"123",
-        clicks3:"33",
-    },{
-        clicks:"1233",
-        clicks2:"123",
-        click2:"123222",
-        clicks3:"33",
-    },{
-        clicks2:"123",
-        clicks3:"33",
-    },
-]
+// const sampleData = [
+//     {
+//         clicks:"1233",
+//         clicks2:"123",
+//         clicks3:"33",
+//     },{
+//         clicks:"1233",
+//         clicks2:"123",
+//         click2:"123222",
+//         clicks3:"33",
+//     },{
+//         clicks2:"123",
+//         clicks3:"33",
+//     },
+// ]
 const TableRow = ({row,schema}) => {
     return(
         <tr className='t-row'>
