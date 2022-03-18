@@ -21,7 +21,7 @@ box-shadow: 0px 4px 4px 0px #00000040;
 
 const DataCards = ({name,value}) => {
   return (
-    <Style>
+    <Style className='data-card'>
         <div className='data-name'>
             {name}
         </div>

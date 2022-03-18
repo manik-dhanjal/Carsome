@@ -4,23 +4,30 @@ import styled from "styled-components"
 const Style = styled.div`
 border:1px solid #E0E0E0;
 min-width:10rem;
-padding:1rem 2rem;
+
 border-radius:1.2rem;
 box-shadow: 0px 4px 4px 0px #00000040;
 min-height:200px;
+overflow-X:auto;
+.scroll-table{
+    min-width:max-content;
+    padding:0.8rem 1rem;
+    &>table{
+        min-width:100%;
+    }
+}
+
 .t-head,.t-row{
-    display:flex;
-    align-items:center;
-    justify-content:stretch;
-    padding:0.5rem;
     .t-cell{
         text-align:Center;
-        width:100%;
+        padding:0.2rem 1rem;
     }
 }
 .t-head{
     &>.t-cell{
         font-weight:500;
+        border-bottom:1px solid #E0E0E0;
+        white-space:nowrap;
     }
 }
 hr{
@@ -57,35 +64,38 @@ const sampleData = [
 ]
 const TableRow = ({row,schema}) => {
     return(
-        <div className='t-row'>
+        <tr className='t-row'>
             {
                 schema.map((column,idx)=>(
-                    <div className='t-cell' key={row[column.id+idx+"cell"]}>
+                    <td className='t-cell' key={row[column.id+idx+"cell"]}>
                         {row[column.id]?row[column.id]:"NULL"}
-                    </div>
+                    </td>
                 ))
             }
-        </div>
+        </tr>
     )
 }
 const Table = ({schema=sampleSchema,data=[]}) => {
 
   return (
-    <Style className='table'>
-        <div className='t-head'>
-            {
-                schema.map((cell,idx)=>(
-                    <div className='t-cell' key={idx+cell.id}>{cell.name}</div>
-                ))
-            }
+    <Style className='table-cont'>
+        <div className='scroll-table'>
+            <table className='table'>
+                <tr className='t-head'>
+                    {
+                        schema.map((cell,idx)=>(
+                            <th className='t-cell' key={idx+cell.id}>{cell.name}</th>
+                        ))
+                    }
+                </tr>
+                {
+                    data&&
+                    data.map((row,idx)=>(
+                        <TableRow schema={schema} row={row} key={idx+"row"}/>
+                    ))
+                }
+            </table>
         </div>
-        <hr/>
-        {
-            data&&
-            data.map((row,idx)=>(
-                <TableRow schema={schema} row={row} key={idx+"row"}/>
-            ))
-        }
     </Style>
   )
 }
