@@ -101,10 +101,14 @@ const LinkCreator = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const {link,ref1,ref2} = linkData.raw;
-        if(!link || link.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?carsome.my/igm)){
-            alert("please enter valid link");
+        const trimmedLink = link.substring(0,link.indexOf("?"))
+        const isLinkValid = trimmedLink.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www.\/\/)?carsome.my\//igm)
+        console.log(trimmedLink)
+        if(!trimmedLink || !isLinkValid){
+            alert("Please enter valid link from www.carsome.my");
+            return;
         }
-        const generatedLink = `${link}?utm_source=${encodeURIComponent(currentUser.uid)}&utm_content=${encodeURIComponent(ref1)}_${encodeURIComponent(ref2)}`;
+        const generatedLink = `${trimmedLink}?utm_source=${encodeURIComponent(currentUser.uid)}&utm_content=${encodeURIComponent(ref1)}_${encodeURIComponent(ref2)}`;
 
         setLinkData((prev)=>{
             return {
