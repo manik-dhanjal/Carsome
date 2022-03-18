@@ -23,6 +23,7 @@ const App = () => {
               </PrivateRoute>
             }
           />
+          <Route path='*' exact={true} element={<NotFound/>} />
         </Route>
       </Routes>
   )
