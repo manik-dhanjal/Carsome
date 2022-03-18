@@ -8,16 +8,23 @@ import {
 import Dashboard from './pages/dash.page';
 import Home from './pages/home.page';
 import NotFound from './pages/not-found.page';
+import PrivateRoute from './components/private-route.components';
 
 const App = () => {
   return (
-   <Layout>
-        <Routes>
+    <Routes>
+        <Route element={<Layout />}>
           <Route path="/" element={<Home/>} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route element={NotFound} />
-        </Routes>
-   </Layout>
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+        </Route>
+      </Routes>
   )
 }
 

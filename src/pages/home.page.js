@@ -88,7 +88,7 @@ const Home = () => {
             <p className='sub-title'>
               Earn Commission for Every Successful Referral
             </p>
-            <Button color={BLUE} looks={BTN_FILL}>Get Started</Button>
+            <Button color={BLUE} looks={BTN_FILL} to="/dashboard">Get Started</Button>
         </div>
         <div className='right'>
           <div className='overlay'></div>
