@@ -6,6 +6,7 @@ import Table from '../components/table.component';
 import { LINK_STATS } from '../constants/table-schema.constants';
 import LinkCreator from '../components/link-creator.component';
 const Styles = styled.div`
+padding-top:1rem;
 &>.container{
   .data-card-cont{
     display:flex;
