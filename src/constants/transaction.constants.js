@@ -26,17 +26,17 @@ export const T_AUTH_SUCCESS = (authType,data) => {
     }
 }
 
-export const REQUEST_PENDING = () => {
+export const REQUEST_PENDING = (data={}) => {
     return {
         status: PENDING,
-        data:{},
+        data:data,
         msg:""
     }
 }
-export const REQUEST_FAILED = (message) => {
+export const REQUEST_FAILED = (message,data={}) => {
     return{
         status: FAILED,
-        data:{},
+        data:data,
         msg:message
     }
 }

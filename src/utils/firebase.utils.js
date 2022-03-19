@@ -9,7 +9,7 @@ import {
     signOut,
     onAuthStateChanged
 } from "firebase/auth"
-import { getFirestore, doc,getDoc,setDoc } from "firebase/firestore"
+import { getFirestore, doc,getDoc,setDoc,collection,addDoc } from "firebase/firestore"
 const firebaseConfig = {
 
   apiKey: "AIzaSyCNBQMGy8X7_my2sw_MYGXfuwsZxJYa5ag",
@@ -58,7 +58,6 @@ const provider = new GoogleAuthProvider();
              console.log("error while creating document",error.message);
          }
      }
-     console.log(userDocRef);
  }
 
  export const createAuthUserWithEmailAndPassword = async (email,password) => {
@@ -75,4 +74,22 @@ export const signOutUser = () => signOut(auth)
 
 export const onAuthStateChangedListener = (callback) =>{
     onAuthStateChanged(auth,callback)
+}
+
+
+// link generation methods
+export const createLinkDocumentForUser = async (uid,link,additionalInformation={}) => {
+
+    const {ref1,ref2} = additionalInformation;
+
+    const userDocRef = doc(db, 'users',  uid);
+    const createdAt = new Date();
+    const linkDocRef = await addDoc( collection( userDocRef, "referrals" ),{
+        link,
+        createdAt,
+        ...additionalInformation
+    } );
+    const utm_content = ref1||ref2? `&utm_content:${ ref1? (encodeURIComponent(ref1)(ref2?",":"")) :"" } ${ ref2? encodeURIComponent(ref2) :"" }` : "";
+    const generatedLink = `${link}?utm_source=${encodeURIComponent(uid)}${utm_content}&utm_medium=${linkDocRef.id}`;
+    return generatedLink;
 }

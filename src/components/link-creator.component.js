@@ -4,6 +4,8 @@ import Input from './input.components'
 import Button from './button.components'
 import tick from "../assets/images/tick.png"
 import { UserContext } from '../context/user.context'
+import { createLinkDocumentForUser } from '../utils/firebase.utils'
+import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../constants/transaction.constants'
 
 const Style = styled.div`
 border:1px solid #E0E0E0;
@@ -69,66 +71,60 @@ box-shadow: 0px 4px 4px 0px #00000040;
     }
 }
 `
+const defaultLinkForm = {
+    link:"",
+    ref1:"",
+    ref2:"",
+}
 const LinkCreator = () => {
-    const [linkData,setLinkData] = useState(
-        {
-            raw:{
-                link:"",
-                ref1:"",
-                ref2:""
-            },
-            gen:{
-                link:"",
-                isCopied:false
-            }
+    const [ linkForm,setLinkForm ] = useState( defaultLinkForm )
+    const [ linkRequest, setLinkRequest ] = useState( REQUEST_SUCCESS({isCopied:false}) );
 
-        }
-    )
     const { currentUser } = useContext(UserContext)
+
     const handleChange = (e) => {
         e.preventDefault();
-        setLinkData((prev)=>{
+        setLinkForm((prev) => {
             return {
                 ...prev,
-                raw:{
-                    ...prev.raw,
-                    [e.target.name]:e.target.value
-                }
-
+                [e.target.name]:e.target.value
             }
         })
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const {link,ref1,ref2} = linkData.raw;
+        const {link,ref1,ref2} = linkForm;
         const trimmedLink = link.substring(0,link.indexOf("?"))
-        const isLinkValid = trimmedLink.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www.\/\/)?carsome.my\//igm)
+        const isLinkValid = trimmedLink.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www.\/\/)?carsome.my(\/)?/igm)
         console.log(trimmedLink)
         if(!trimmedLink || !isLinkValid){
             alert("Please enter valid link from www.carsome.my");
             return;
         }
-        const generatedLink = `${trimmedLink}?utm_source=${encodeURIComponent(currentUser.uid)}&utm_content=${encodeURIComponent(ref1)}_${encodeURIComponent(ref2)}`;
+        try{
+            setLinkRequest( REQUEST_PENDING({isCopied:false}) )
+            const generatedLink = await createLinkDocumentForUser(currentUser.uid, trimmedLink, { ref1 ,ref2 });
+            setLinkForm( defaultLinkForm );
+            setLinkRequest( REQUEST_SUCCESS({
+                link:generatedLink,
+                isCopied:false,
+            }) );
+        }
+        catch(e){
+            console.log(e);
+            setLinkRequest( REQUEST_FAILED(e.message,{isCopied:false}) );
+            alert("Link generation failed, Please try again");
+        }
 
-        setLinkData((prev)=>{
-            return {
-                ...prev,
-                gen:{
-                    isCopied:false,
-                    link:generatedLink
-                }
-
-            }
-        })
     }
     const copyText = () =>{
-        if(!linkData.gen.link) return;
-        navigator.clipboard.writeText(linkData.gen.link);
-        setLinkData((prev)=>{
+        if(!linkRequest.data.link) return;
+        navigator.clipboard.writeText(linkRequest.data.link);
+        setLinkRequest((prev)=>{
             return {
                 ...prev,
-                gen:{
-                    ...prev.gen,
+                data:{
+                    ...prev.data,
                     isCopied:true,
                 }
 
@@ -137,9 +133,9 @@ const LinkCreator = () => {
     }
   if(!currentUser) return;
   return (
-      <Style className='link-creator' isCopied={linkData.gen.isCopied}>
+      <Style className='link-creator' isCopied={linkRequest.data.isCopied}>
           <form onSubmit={handleSubmit}>
-            <Input placeholder="https://www.carsome.com/buy-car/cp02020202" onChange={handleChange} value={linkData.link} name="link" required/>
+            <Input placeholder="https://www.carsome.com/buy-car/cp02020202" onChange={handleChange} value={linkForm.link} name="link" required/>
             <div className="commision-info">
                 <span className='icon img contain'>
                     <img src={tick} alt="tick icon"/>
@@ -148,18 +144,18 @@ const LinkCreator = () => {
                     commission available - RM500 per test drive
                 </span>
             </div>
-            <Input placeholder="Refrence 1" onChange={handleChange} value={linkData.ref1} name="ref1" required/>
-            <Input placeholder="Refrence 2" onChange={handleChange} value={linkData.ref2} name="ref2" required/>
-            <Button type="submit">Create Link</Button>
+            <Input placeholder="Refrence 1 (Optional)" onChange={handleChange} value={linkForm.ref1} name="ref1"/>
+            <Input placeholder="Refrence 2 (Optional)" onChange={handleChange} value={linkForm.ref2} name="ref2"/>
+            <Button type="submit" isLoading={linkRequest.status===PENDING}>Create Link</Button>
           </form>
         {
-            linkData.gen.link&&
+            linkRequest.data.link&&
             (
               <div className='copy-text' onClick={copyText} >
                 <div className='text-to-copy'>
-                    {linkData.gen.link}
+                    {linkRequest.data.link}
                 </div>
-                <span className='indicator'>{linkData.gen.isCopied?"copied !":"copy link"}</span>
+                <span className='indicator'>{linkRequest.data.isCopied?"copied !":"copy link"}</span>
               </div>
             )
         }
