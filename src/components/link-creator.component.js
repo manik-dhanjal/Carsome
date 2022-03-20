@@ -7,6 +7,7 @@ import { UserContext } from '../context/user.context'
 import { createLinkDocumentForUser } from '../utils/firebase.utils'
 import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../constants/transaction.constants'
 
+
 const Style = styled.div`
 border:1px solid #E0E0E0;
 min-width:10rem;
@@ -95,9 +96,9 @@ const LinkCreator = () => {
         e.preventDefault();
         const {link,ref1,ref2} = linkForm;
         const trimmedLink = link.includes("?")? link.substring(0,link.indexOf("?")):link;
-        const isLinkValid = trimmedLink.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.|http:\\\\www\.|https:\\\\www\.|http:\\\\|https:\\\\)?carsome.my(\/|\\)?/igm)
-        if(!trimmedLink || !isLinkValid){
-            alert("Please enter valid link from www.carsome.my");
+        // const isLinkValid = trimmedLink.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.|http:\\\\www\.|https:\\\\www\.|http:\\\\|https:\\\\)?carsome.my(\/|\\)?/igm)
+        if(!trimmedLink){
+            alert("Please enter valid link");
             return;
         }
         try{

@@ -9,7 +9,10 @@ import {
     signOut,
     onAuthStateChanged
 } from "firebase/auth"
-import { getFirestore, doc,getDoc,setDoc,collection,onSnapshot,query } from "firebase/firestore"
+import { getFirestore, doc,getDoc,setDoc,collection,onSnapshot,query,getDocs } from "firebase/firestore"
+import encodeUrl from "encodeurl";
+import { COMMISSION_CALCULATOR } from "./formula.utils";
+
 const firebaseConfig = {
 
   apiKey: "AIzaSyCNBQMGy8X7_my2sw_MYGXfuwsZxJYa5ag",
@@ -89,20 +92,35 @@ export const createLinkDocumentForUser = async (uid,link,additionalInformation={
     //     createdAt,
     //     ...additionalInformation
     // } );
-    const utm_content = ref1||ref2? `&utm_content:${ ref1? (encodeURIComponent(ref1)(ref2?",":"")) :"" } ${ ref2? encodeURIComponent(ref2) :"" }` : "";
+    const utm_content = ref1||ref2? `&utm_content=${ ( ref1? (encodeUrl(ref1)+(ref2?",":"")):"" ) + (ref2? encodeUrl(ref2) :"") }` : "";
     // const generatedLink = `${link}?utm_source=${encodeURIComponent(uid)}${utm_content}&utm_medium=${linkDocRef.id}`;
     const generatedLink = `${link}?utm_source=${encodeURIComponent(uid)}${utm_content}`;
     return generatedLink;
 }
 
-export const onUserReferralsStateChangedListener = (uid,callback) => {
+export const onUserReferralsStateChangedListener = async (uid,callback) => {
     const q = query(collection(db, "users",uid,"referrals"));
+    const campToComRef = await getDocs(collection(db, "campaign"));
+    const campToCom = [];
+    campToComRef.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        const docData = doc.data();
+
+        console.log(doc.id, " => ", docData);
+        campToCom.push({
+            id:doc.id,
+            ...docData
+        })
+      });
+
     return onSnapshot(q, (snapshot)=>{
         snapshot.docChanges().forEach((change)=>{
             const docObject = change.doc.data()
+            console.log(COMMISSION_CALCULATOR(docObject,campToCom))
             callback({
                 id:change.doc.id,
                 ...docObject,
+                commission: COMMISSION_CALCULATOR(docObject,campToCom),
                 createdAt:docObject.createdAt.toDate()
             })
         })

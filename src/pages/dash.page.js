@@ -4,7 +4,7 @@ import DataCards from '../components/data-cards.components';
 import Table from '../components/table.component';
 import { LINK_STATS } from '../constants/table-schema.constants';
 import LinkCreator from '../components/link-creator.component';
-import { ReferralsContext, UserStatusContext } from '../context/user.context';
+import { ReferralsContext } from '../context/user.context';
 import { CLICKS_CALCULATOR, COMMISSION_RATE_CALCULATOR, CONVERSION_CALCULATOR, CONVERSION_RATE_CALCULATOR } from '../utils/formula.utils';
 
 const Styles = styled.div`
@@ -13,8 +13,12 @@ padding-top:1rem;
   .data-card-cont{
     display:flex;
     flex-wrap:wrap;
-    justify-content space-between;
-    margin-bottom:20px;
+    justify-content start;
+    margin-bottom:1rem;
+    .data-card{
+      margin-right:1rem;
+      margin-bottom:1rem;
+    }
   }
 .section-2{
   display:flex;
@@ -72,7 +76,7 @@ padding-top:1rem;
 
 const Dashboard = () => {
   const {userReferrals} = useContext(ReferralsContext);
-  const {userStatus} = useContext(UserStatusContext);
+  // const {userStatus} = useContext(UserStatusContext);
 
   return (
     <Styles>
@@ -81,9 +85,9 @@ const Dashboard = () => {
           <DataCards name={"Clicks"} value={ CLICKS_CALCULATOR(userReferrals) }/>
           <DataCards name={"Conversions"} value={ CONVERSION_CALCULATOR(userReferrals) }/>
           <DataCards name={"Conversion Rate"} value={ CONVERSION_RATE_CALCULATOR(userReferrals)+"%"}/>
-          <DataCards name={"Value"} value={ parseInt(userStatus.value||0) }/>
+          {/* <DataCards name={"Value"} value={ parseInt(userStatus.value||0) }/> */}
           <DataCards name={"Commission"} value={"RM "+COMMISSION_RATE_CALCULATOR(userReferrals)}/>
-          <DataCards name={"Payment Approved"} value={ parseInt(userStatus.paymentApproved||0) }/>
+          {/* <DataCards name={"Payment Approved"} value={ parseInt(userStatus.paymentApproved||0) }/> */}
         </div>
         <div className='section-2'>
           <Table schema={LINK_STATS} data={userReferrals}/>

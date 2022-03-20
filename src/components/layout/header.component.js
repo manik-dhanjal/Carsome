@@ -3,12 +3,11 @@ import { useState,useContext } from 'react';
 import styled from 'styled-components'
 import logo from "../../assets/images/Logo.png"
 import Button from '../button.components';
-import { BLACK, BTN_BORDER, BTN_TRANS } from '../../constants/style.contstants'
+import { BLACK, BLUE, BTN_BORDER, BTN_TRANS } from '../../constants/style.contstants'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars,faXmark } from '@fortawesome/free-solid-svg-icons'
-import Auth from '../auth.component';
 import { UserContext } from '../../context/user.context';
-import { signOutUser } from '../../utils/firebase.utils';
+import { signOutUser,signInWithGooglePopup } from '../../utils/firebase.utils';
 import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../../constants/transaction.constants';
 
 const Style = styled.header`
@@ -47,9 +46,6 @@ nav>.container{
     justify-content:end;
     & .btn-cont{
       margin-left:1rem;
-    }
-    #login-btn .btn:hover{
-      color:${BLACK}
     }
   }
   .nav-menu{
@@ -129,29 +125,30 @@ nav>.container{
 
 const Header = () => {
   const [isOpen,setOpen] = useState(false);
-  const [isAuthOpen,setIsAuthOpen] = useState({
-    state:false,
-    signIn:false
-  })
-  const [signOutRequest,setSignOutRequest] = useState(REQUEST_SUCCESS());
+  const [authRequest,setAuthRequest] = useState(REQUEST_SUCCESS());
   const {currentUser} = useContext(UserContext);
-  const handleAuthOpenForSignIn = (res) => {
-      setIsAuthOpen({
-        state:true,
-        signIn:res
-      })
-  }
+
   const signOutHandler = async () => {
     try{
-      setSignOutRequest( REQUEST_PENDING() );
+      setAuthRequest( REQUEST_PENDING() );
       await signOutUser();
-      setSignOutRequest( REQUEST_SUCCESS() );
+      setAuthRequest( REQUEST_SUCCESS() );
     }
     catch(e){
-      setSignOutRequest( REQUEST_FAILED(e.message) )
+      setAuthRequest( REQUEST_FAILED(e.message) )
       console.log(e.message)
     }
   }
+  const logGoogleUser = async () => {
+    try{
+      setAuthRequest( REQUEST_PENDING() );
+      await signInWithGooglePopup();
+      setAuthRequest( REQUEST_SUCCESS() );
+    }
+    catch(e){
+      setAuthRequest( REQUEST_FAILED(e.message) );
+    }
+}
   return (
     <Style isOpen={isOpen}>
         <nav>
@@ -179,11 +176,10 @@ const Header = () => {
                 {
                   currentUser?
                   (
-                    <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={signOutRequest.status === PENDING}>Sign out</Button>  
+                    <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={authRequest.status === PENDING} >Sign out</Button>  
                   ):(
                     <>
-                      <Button looks={BTN_TRANS} color={BLACK} id="login-btn" onClick={()=> handleAuthOpenForSignIn(true)}>Login</Button>
-                      <Button looks={BTN_BORDER} color={BLACK} id="signup-btn" onClick={()=> handleAuthOpenForSignIn(false)}>Sign up</Button>
+                      <Button color={BLUE} id="login-btn" onClick={()=> logGoogleUser()} isLoading={authRequest.status === PENDING}>Login with Google</Button>
                     </>
                   )
                 }
@@ -224,23 +220,17 @@ const Header = () => {
                   currentUser?
                   (
                     <li>
-                      <Button looks={BTN_TRANS} color={BLACK} onClick={signOutHandler} isLoading={signOutRequest.status === PENDING}>Sign out</Button>  
+                      <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={authRequest.status === PENDING} >Sign out</Button>  
                     </li>
                   ):(
-                    <>
-                        <li>
-                          <Button looks={BTN_TRANS} color={BLACK} onClick={()=> handleAuthOpenForSignIn(true)}>Login</Button>
-                        </li>
-                        <li>
-                          <Button looks={BTN_TRANS} color={BLACK} onClick={()=> handleAuthOpenForSignIn(false)}>signup</Button>
-                        </li>
-                    </>
+                    <li>
+                      <Button color={BLUE} id="login-btn" onClick={()=> logGoogleUser()} isLoading={authRequest.status === PENDING}>Login with Google</Button>
+                    </li>
                   )
                 }
                   
           </ul>
         </div>
-        <Auth open={isAuthOpen.state} isSignIn={isAuthOpen.signIn} onClose={() => setIsAuthOpen(false)}/>
         <div className='nav-dummy'></div>
     </Style>
   )

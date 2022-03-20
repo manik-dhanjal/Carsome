@@ -1,9 +1,9 @@
 export const REFERRALS_RESPONSE = ({
     createdAt="",
-    campaign="",
+    campaign="NULL",
     clicks=0,
-    ref1="",
-    ref2="",
+    ref1="NULL",
+    ref2="NULL",
     commission=0,
     conversion=0,
     id=""
@@ -13,8 +13,8 @@ export const REFERRALS_RESPONSE = ({
         campaign,
         clicks,
         conversion,
-        ref1,
-        ref2,
+        ref1: ref1?ref1:"NULL",
+        ref2: ref2?ref2:"NULL",
         commission,
         id
     }

@@ -74,10 +74,7 @@ const TableRow = ({row,schema,r_idx}) => {
             {
                 schema.map((column,c_idx)=>(
                     <td className='t-cell' key={"cell"+c_idx+""+r_idx}>
-                        {row[column.id]?
-                            (column.dataModifier?column.dataModifier(row[column.id]):row[column.id])
-                        :"NULL"}
-
+                           {column.dataModifier?column.dataModifier(row[column.id]):row[column.id]}
                     </td>
                 ))
             }

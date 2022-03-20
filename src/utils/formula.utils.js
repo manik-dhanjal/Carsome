@@ -27,3 +27,11 @@ export const COMMISSION_RATE_CALCULATOR = (arr) =>{
         return total + parseInt(current.commission);
     },0)
 }
+export const COMMISSION_CALCULATOR = ({conversion=0,campaign},campaignList) =>{
+   const commissionForCampagin = campaignList.reduce((total,cur)=>{
+        if(total) return total;
+        if(cur.name===campaign) return parseInt(cur.commission);
+        return 0;
+   },0)
+   return commissionForCampagin * parseInt(conversion)
+}
