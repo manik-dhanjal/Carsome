@@ -25,7 +25,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-
+const unsubscribeOnSignOut = [];
 export const app = initializeApp(firebaseConfig);
 
 const provider = new GoogleAuthProvider();
@@ -73,7 +73,13 @@ const provider = new GoogleAuthProvider();
 
     return await signInWithEmailAndPassword(auth,email,password);
 }
-export const signOutUser = () => signOut(auth)
+
+export const signOutUser = () =>{
+     unsubscribeOnSignOut.map((unsubscribe)=>{
+        unsubscribe();
+     })
+     signOut(auth)
+}
 
 export const onAuthStateChangedListener = (callback) =>{
    return onAuthStateChanged(auth,callback)
@@ -105,18 +111,15 @@ export const onUserReferralsStateChangedListener = async (uid,callback) => {
     campToComRef.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
         const docData = doc.data();
-
-        console.log(doc.id, " => ", docData);
         campToCom.push({
             id:doc.id,
             ...docData
         })
       });
 
-    return onSnapshot(q, (snapshot)=>{
+    const unsubscribe = onSnapshot(q, (snapshot)=>{
         snapshot.docChanges().forEach((change)=>{
             const docObject = change.doc.data()
-            console.log(COMMISSION_CALCULATOR(docObject,campToCom))
             callback({
                 id:change.doc.id,
                 ...docObject,
@@ -125,12 +128,13 @@ export const onUserReferralsStateChangedListener = async (uid,callback) => {
             })
         })
     });
-
+    unsubscribeOnSignOut.push(unsubscribe);
 }
 
 export const onUserStateChangeListener = (uid,callback) => {
     const q = query(doc(db, "users",uid));
-    return onSnapshot(q, (snapshot)=>{
+    const unsubscribe = onSnapshot(q, (snapshot)=>{
         callback( snapshot.data() )
     })
+    unsubscribeOnSignOut.push(unsubscribe);
 }

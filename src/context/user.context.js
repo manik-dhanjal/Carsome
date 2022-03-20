@@ -50,10 +50,10 @@ export const UserProvider = ({children}) => {
             setUserReferrals([])
             setUserStatus({})
         }
-        return () => {
-            unsubscribeRef();
-            unsubscribeStat();
-        }
+        // return () => {
+        //     unsubscribeRef();
+        //     unsubscribeStat();
+        // }
     },[currentUser])
     return (
         <UserContext.Provider value={value}>

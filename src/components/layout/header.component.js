@@ -90,7 +90,7 @@ nav>.container{
   z-index:1003;
   background:white;
   height:100vh;
-  width:200px;
+  width:220px;
   border-right:1px solid #f1f1f1;
   padding:40px 30px;
   transition:0.3s ease;
@@ -114,9 +114,13 @@ nav>.container{
     &>li {
       margin-bottom:0.5rem;
       .btn{
-        padding:0;
         font-weight:300;
       }
+    }
+  }
+  .menu{
+    .btn{
+      padding:0;
     }
   }
   
@@ -143,6 +147,7 @@ const Header = () => {
     try{
       setAuthRequest( REQUEST_PENDING() );
       await signInWithGooglePopup();
+      setOpen(false)
       setAuthRequest( REQUEST_SUCCESS() );
     }
     catch(e){
@@ -200,21 +205,23 @@ const Header = () => {
           <div className='cross-cont' onClick={()=>setOpen(false)}>
             <FontAwesomeIcon icon={faXmark} />
           </div>
-          <ul className="menu">
-                  <li>
-                    <Button to="/" looks={BTN_TRANS} color={BLACK}>Home</Button>
-                  </li>
-                  <li>
-                    <Button to="/menu-1" looks={BTN_TRANS} color={BLACK}>Menu 1</Button>
-                  </li>
-                  <li>
-                    <Button to="/menu-2" looks={BTN_TRANS} color={BLACK}>Menu 2</Button>
-                  </li>
-                  <li>
-                    <Button to="/menu-3" looks={BTN_TRANS} color={BLACK}>Menu 3</Button>
-                  </li>
-          </ul>
-          <hr/>
+            {
+                currentUser&&(
+                  <>
+                    <ul className="menu">
+                      <li>
+                        <Button to="/" looks={BTN_TRANS} color={BLACK} onClick={()=>setOpen(false)}>Home</Button>
+                      </li>
+                      <li>
+                        <Button to="/dashboard" looks={BTN_TRANS} color={BLACK} onClick={()=>setOpen(false)}>Dashboard</Button>
+                      </li>
+                    </ul>
+                    <hr/>
+                  </>
+                )
+            }
+
+
           <ul className="menu-2">
                 {
                   currentUser?
