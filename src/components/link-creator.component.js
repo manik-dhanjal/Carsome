@@ -94,9 +94,8 @@ const LinkCreator = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const {link,ref1,ref2} = linkForm;
-        const trimmedLink = link.substring(0,link.indexOf("?"))
-        const isLinkValid = trimmedLink.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www.\/\/)?carsome.my(\/)?/igm)
-        console.log(trimmedLink)
+        const trimmedLink = link.includes("?")? link.substring(0,link.indexOf("?")):link;
+        const isLinkValid = trimmedLink.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.|http:\\\\www\.|https:\\\\www\.|http:\\\\|https:\\\\)?carsome.my(\/|\\)?/igm)
         if(!trimmedLink || !isLinkValid){
             alert("Please enter valid link from www.carsome.my");
             return;
@@ -135,7 +134,7 @@ const LinkCreator = () => {
   return (
       <Style className='link-creator' isCopied={linkRequest.data.isCopied}>
           <form onSubmit={handleSubmit}>
-            <Input placeholder="https://www.carsome.com/buy-car/cp02020202" onChange={handleChange} value={linkForm.link} name="link" required/>
+            <Input placeholder="https://www.carsome.my/buy-car/cp02020202" onChange={handleChange} value={linkForm.link} name="link" required/>
             <div className="commision-info">
                 <span className='icon img contain'>
                     <img src={tick} alt="tick icon"/>

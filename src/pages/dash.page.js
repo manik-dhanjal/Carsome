@@ -1,9 +1,12 @@
-import React from 'react'
+import React,{useContext} from 'react'
 import styled from "styled-components";
 import DataCards from '../components/data-cards.components';
 import Table from '../components/table.component';
 import { LINK_STATS } from '../constants/table-schema.constants';
 import LinkCreator from '../components/link-creator.component';
+import { ReferralsContext, UserStatusContext } from '../context/user.context';
+import { CLICKS_CALCULATOR, COMMISSION_RATE_CALCULATOR, CONVERSION_CALCULATOR, CONVERSION_RATE_CALCULATOR } from '../utils/formula.utils';
+
 const Styles = styled.div`
 padding-top:1rem;
 &>.container{
@@ -15,6 +18,7 @@ padding-top:1rem;
   }
 .section-2{
   display:flex;
+  align-items:start;
   margin-bottom:2rem;
   .table-cont{
     width:70%;
@@ -42,8 +46,11 @@ padding-top:1rem;
   &>.container{
     .data-card-cont{
       margin-bottom:0;
+      justify-content:space-between;
       .data-card{
         margin-bottom:1rem;
+        margin-left:0;
+        margin-right:0;
       }
     }
     .section-2{
@@ -64,19 +71,22 @@ padding-top:1rem;
 
 
 const Dashboard = () => {
+  const {userReferrals} = useContext(ReferralsContext);
+  const {userStatus} = useContext(UserStatusContext);
+
   return (
     <Styles>
       <div className='container'>
         <div className='data-card-cont'>
-          <DataCards name={"Clicks"} value={12502}/>
-          <DataCards name={"Conversions"} value={42}/>
-          <DataCards name={"Conversion Rate"} value={"0.3%"}/>
-          <DataCards name={"Value"} value={200}/>
-          <DataCards name={"Commission"} value={"RM20,298"}/>
-          <DataCards name={"Payment Approved"} value={1200}/>
+          <DataCards name={"Clicks"} value={ CLICKS_CALCULATOR(userReferrals) }/>
+          <DataCards name={"Conversions"} value={ CONVERSION_CALCULATOR(userReferrals) }/>
+          <DataCards name={"Conversion Rate"} value={ CONVERSION_RATE_CALCULATOR(userReferrals)+"%"}/>
+          <DataCards name={"Value"} value={ parseInt(userStatus.value||0) }/>
+          <DataCards name={"Commission"} value={"RM "+COMMISSION_RATE_CALCULATOR(userReferrals)}/>
+          <DataCards name={"Payment Approved"} value={ parseInt(userStatus.paymentApproved||0) }/>
         </div>
         <div className='section-2'>
-          <Table schema={LINK_STATS}/>
+          <Table schema={LINK_STATS} data={userReferrals}/>
           <LinkCreator/>
         </div>
       </div>

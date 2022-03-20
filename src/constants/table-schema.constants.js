@@ -1,23 +1,30 @@
 export const LINK_STATS = [
     {
         name:"Date",
-        id:"date"
+        id:"date",
+        dataModifier:(data) => data.toLocaleDateString("en-US")
     },
     {
         name:"Campaign",
         id:"campaign"
+
+    },
+    {
+        name:"Clicks",
+        id:"clicks",
     },
     {
         name:"Conversions",
-        id:"conversions"
+        id:"conversion",
     },{
         name:"Refrence 1",
-        id:"refrence1"
+        id:"ref1"
     },{
         name:"Refrence 2",
-        id:"refrence2"
+        id:"ref2"
     },{
         name:"Commission",
-        id:"commission"
+        id:"commission",
+        dataModifier: (data) => "RM "+data
     }
 ]

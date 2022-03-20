@@ -9,7 +9,7 @@ import {
     signOut,
     onAuthStateChanged
 } from "firebase/auth"
-import { getFirestore, doc,getDoc,setDoc,collection,addDoc } from "firebase/firestore"
+import { getFirestore, doc,getDoc,setDoc,collection,onSnapshot,query } from "firebase/firestore"
 const firebaseConfig = {
 
   apiKey: "AIzaSyCNBQMGy8X7_my2sw_MYGXfuwsZxJYa5ag",
@@ -73,7 +73,7 @@ const provider = new GoogleAuthProvider();
 export const signOutUser = () => signOut(auth)
 
 export const onAuthStateChangedListener = (callback) =>{
-    onAuthStateChanged(auth,callback)
+   return onAuthStateChanged(auth,callback)
 }
 
 
@@ -82,14 +82,37 @@ export const createLinkDocumentForUser = async (uid,link,additionalInformation={
 
     const {ref1,ref2} = additionalInformation;
 
-    const userDocRef = doc(db, 'users',  uid);
-    const createdAt = new Date();
-    const linkDocRef = await addDoc( collection( userDocRef, "referrals" ),{
-        link,
-        createdAt,
-        ...additionalInformation
-    } );
+    // const userDocRef = doc(db, 'users',  uid);
+    // const createdAt = new Date();
+    // const linkDocRef = await addDoc( collection( userDocRef, "referrals" ),{
+    //     link,
+    //     createdAt,
+    //     ...additionalInformation
+    // } );
     const utm_content = ref1||ref2? `&utm_content:${ ref1? (encodeURIComponent(ref1)(ref2?",":"")) :"" } ${ ref2? encodeURIComponent(ref2) :"" }` : "";
-    const generatedLink = `${link}?utm_source=${encodeURIComponent(uid)}${utm_content}&utm_medium=${linkDocRef.id}`;
+    // const generatedLink = `${link}?utm_source=${encodeURIComponent(uid)}${utm_content}&utm_medium=${linkDocRef.id}`;
+    const generatedLink = `${link}?utm_source=${encodeURIComponent(uid)}${utm_content}`;
     return generatedLink;
+}
+
+export const onUserReferralsStateChangedListener = (uid,callback) => {
+    const q = query(collection(db, "users",uid,"referrals"));
+    return onSnapshot(q, (snapshot)=>{
+        snapshot.docChanges().forEach((change)=>{
+            const docObject = change.doc.data()
+            callback({
+                id:change.doc.id,
+                ...docObject,
+                createdAt:docObject.createdAt.toDate()
+            })
+        })
+    });
+
+}
+
+export const onUserStateChangeListener = (uid,callback) => {
+    const q = query(doc(db, "users",uid));
+    return onSnapshot(q, (snapshot)=>{
+        callback( snapshot.data() )
+    })
 }
