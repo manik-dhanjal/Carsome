@@ -10,8 +10,10 @@ import {
     onAuthStateChanged
 } from "firebase/auth"
 import { getFirestore, doc,getDoc,setDoc,collection,onSnapshot,query,getDocs } from "firebase/firestore"
-import encodeUrl from "encodeurl";
+// import encodeUrl from "encodeurl";
 import { COMMISSION_CALCULATOR } from "./formula.utils";
+import axios from "axios"
+
 
 const firebaseConfig = {
 
@@ -75,7 +77,7 @@ const provider = new GoogleAuthProvider();
 }
 
 export const signOutUser = () =>{
-     unsubscribeOnSignOut.map((unsubscribe)=>{
+     unsubscribeOnSignOut.forEach((unsubscribe)=>{
         unsubscribe();
      })
      signOut(auth)
@@ -87,21 +89,18 @@ export const onAuthStateChangedListener = (callback) =>{
 
 
 // link generation methods
-export const createLinkDocumentForUser = async (uid,link,additionalInformation={}) => {
+export const createShortenLink = async (uid,link,additionalInformation={}) => {
 
     const {ref1,ref2} = additionalInformation;
-
-    // const userDocRef = doc(db, 'users',  uid);
-    // const createdAt = new Date();
-    // const linkDocRef = await addDoc( collection( userDocRef, "referrals" ),{
-    //     link,
-    //     createdAt,
-    //     ...additionalInformation
-    // } );
-    const utm_content = ref1||ref2? `&utm_content=${ ( ref1? (encodeUrl(ref1)+(ref2?",":"")):"" ) + (ref2? encodeUrl(ref2) :"") }` : "";
-    // const generatedLink = `${link}?utm_source=${encodeURIComponent(uid)}${utm_content}&utm_medium=${linkDocRef.id}`;
-    const generatedLink = `${link}?utm_source=${encodeURIComponent(uid)}${utm_content}`;
-    return generatedLink;
+    const utm_content = ref1||ref2? `&utm_content=${ ( ref1? ref1 + ( ref2?",":"" ) :"" ) + (ref2? ref2 :"") }` : "";
+    const encodedLink = encodeURIComponent(`${link}?utm_source=${uid}${utm_content}`);
+    const {data} = await axios.post("https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyCNBQMGy8X7_my2sw_MYGXfuwsZxJYa5ag",{
+        longDynamicLink: `https://csnow.page.link/?link=${encodedLink}`
+    })
+    if(!data||!data.shortLink){
+        throw new Error("Didn't get shorten link")
+    }
+    return data.shortLink;
 }
 
 export const onUserReferralsStateChangedListener = async (uid,callback) => {
@@ -138,3 +137,4 @@ export const onUserStateChangeListener = (uid,callback) => {
     })
     unsubscribeOnSignOut.push(unsubscribe);
 }
+

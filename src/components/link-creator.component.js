@@ -4,7 +4,7 @@ import Input from './input.components'
 import Button from './button.components'
 import tick from "../assets/images/tick.png"
 import { UserContext } from '../context/user.context'
-import { createLinkDocumentForUser } from '../utils/firebase.utils'
+import { createShortenLink } from '../utils/firebase.utils'
 import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../constants/transaction.constants'
 
 
@@ -92,28 +92,40 @@ const LinkCreator = () => {
             }
         })
     }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const {link,ref1,ref2} = linkForm;
-        const trimmedLink = link.includes("?")? link.substring(0,link.indexOf("?")):link;
+        var trimmedLink = link.includes("?")? link.substring(0,link.indexOf("?")):link;
+
         // const isLinkValid = trimmedLink.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.|http:\\\\www\.|https:\\\\www\.|http:\\\\|https:\\\\)?carsome.my(\/|\\)?/igm)
         if(!trimmedLink){
             alert("Please enter valid link");
             return;
         }
+        if(!trimmedLink.match(/^(http:\/\/||https:\/\/)?/igm)[0]){
+            trimmedLink = "https://"+trimmedLink;
+        }
         try{
             setLinkRequest( REQUEST_PENDING({isCopied:false}) )
-            const generatedLink = await createLinkDocumentForUser(currentUser.uid, trimmedLink, { ref1 ,ref2 });
+            const generatedLink = await createShortenLink(currentUser.uid, trimmedLink, { ref1 ,ref2 });
             setLinkForm( defaultLinkForm );
             setLinkRequest( REQUEST_SUCCESS({
                 link:generatedLink,
                 isCopied:false,
             }) );
         }
-        catch(e){
-            console.log(e);
-            setLinkRequest( REQUEST_FAILED(e.message,{isCopied:false}) );
-            alert("Link generation failed, Please try again");
+        catch(error){
+            var message = "Link generation failed";
+            if(error.response){
+                const mapErrorCodeToMessage = {
+                    'INVALID_ARGUMENT':"Link is not valid"
+                }
+                message = mapErrorCodeToMessage[error.response.data.error.status]||"Link generation failed"
+            }
+            setLinkForm( defaultLinkForm );
+            alert(message+", Please try again");
+            setLinkRequest( REQUEST_FAILED(message,{isCopied:false}) );
         }
 
     }

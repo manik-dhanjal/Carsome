@@ -33,27 +33,22 @@ export const UserProvider = ({children}) => {
     return unsubscribe;
     },[])
     useEffect( ()=>{
-        const unsubscribeRef = currentUser? 
+        if(currentUser){
             onUserReferralsStateChangedListener(currentUser.uid,(newDoc)=>{
-                    setUserReferrals((prev)=>{
-                        return [
-                            ...prev,
-                            REFERRALS_RESPONSE(newDoc)
-                        ]
-                    })
-            }) : () =>{};
-        const unsubscribeStat = currentUser?
+                setUserReferrals((prev)=>{
+                    return [
+                        ...prev,
+                        REFERRALS_RESPONSE(newDoc)
+                    ]
+                })
+            })
             onUserStateChangeListener(currentUser.uid,(data)=>{
-                setUserStatus( USER_STATUS_RESPONSE(data) )
-            }) : () => {};
-        if(!currentUser){
+                    setUserStatus( USER_STATUS_RESPONSE(data) )
+            })
+        }else{
             setUserReferrals([])
             setUserStatus({})
         }
-        // return () => {
-        //     unsubscribeRef();
-        //     unsubscribeStat();
-        // }
     },[currentUser])
     return (
         <UserContext.Provider value={value}>
