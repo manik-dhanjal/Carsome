@@ -14,7 +14,14 @@ const App = () => {
   return (
     <Routes>
         <Route element={<Layout />}>
-          <Route path="/" element={<Home/>} />
+          <Route
+            path="/"
+            element={
+              <PrivateRoute not={true}>
+                <Home/>
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={

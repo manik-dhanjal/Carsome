@@ -1,8 +1,12 @@
 import React from 'react'
+import { useContext } from 'react';
 import styled from "styled-components"
 import Button from '../components/button.components'
 import { BLUE, BTN_FILL, L_BLACK } from '../constants/style.contstants'
 import bannerImg from "../assets/images/banner_img.png"
+import { signInWithGooglePopup } from '../utils/firebase.utils';
+import { REQUEST_FAILED, REQUEST_PENDING } from '../constants/transaction.constants';
+import { UserContext } from '../context/user.context';
 const Styles = styled.div`
   &>.container{
     display:flex;
@@ -78,6 +82,16 @@ const Styles = styled.div`
   }
 `
 const Home = () => {
+  const {setCurrentUser} = useContext(UserContext);
+  const logGoogleUser = async () => {
+    try{
+      setCurrentUser( REQUEST_PENDING() );
+      await signInWithGooglePopup();
+    }
+    catch(e){
+      setCurrentUser( REQUEST_FAILED(e.message) );
+    }
+}
   return (
     <Styles>
       <div className='container'>
@@ -88,7 +102,7 @@ const Home = () => {
             <p className='sub-title'>
               Earn Commission for Every Successful Referral
             </p>
-            <Button color={BLUE} looks={BTN_FILL} to="/dashboard">Get Started</Button>
+            <Button color={BLUE} looks={BTN_FILL} onClick={logGoogleUser}>Get Started</Button>
         </div>
         <div className='right'>
           <div className='overlay'></div>

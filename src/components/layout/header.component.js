@@ -2,6 +2,7 @@ import React from 'react'
 import { useState,useContext } from 'react';
 import styled from 'styled-components'
 import logo from "../../assets/images/Logo.png"
+import logoDark from "../../assets/images/logo-dark.svg"
 import Button from '../button.components';
 import { BLACK, BLUE, BTN_BORDER, BTN_TRANS } from '../../constants/style.contstants'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,6 +10,7 @@ import { faBars,faXmark } from '@fortawesome/free-solid-svg-icons'
 import { UserContext } from '../../context/user.context';
 import { signOutUser,signInWithGooglePopup } from '../../utils/firebase.utils';
 import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../../constants/transaction.constants';
+import { _isNotEmpty } from '../../utils/validations.utils';
 
 const Style = styled.header`
 nav{
@@ -33,7 +35,7 @@ nav>.container{
     display:none;
   }
   #logo{
-    height:50px;
+    height:20px;
   }
   &>div{
     display:flex;
@@ -55,6 +57,11 @@ nav>.container{
     list-style-type:none;
     &>li{
       margin:0 10px;
+      &>.btn-cont{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+      }
       .btn{
         padding: 0 0.5em;
         font-weight:300;
@@ -129,29 +136,27 @@ nav>.container{
 
 const Header = () => {
   const [isOpen,setOpen] = useState(false);
-  const [authRequest,setAuthRequest] = useState(REQUEST_SUCCESS());
-  const {currentUser} = useContext(UserContext);
+  const {currentUser,setCurrentUser} = useContext(UserContext);
 
   const signOutHandler = async () => {
     try{
-      setAuthRequest( REQUEST_PENDING() );
+      setCurrentUser( REQUEST_PENDING() );
       await signOutUser();
-      setAuthRequest( REQUEST_SUCCESS() );
+      setCurrentUser( REQUEST_SUCCESS() );
     }
     catch(e){
-      setAuthRequest( REQUEST_FAILED(e.message) )
+      setCurrentUser( REQUEST_FAILED(e.message) )
       console.log(e.message)
     }
   }
   const logGoogleUser = async () => {
     try{
-      setAuthRequest( REQUEST_PENDING() );
+      setCurrentUser( REQUEST_PENDING() );
       await signInWithGooglePopup();
       setOpen(false)
-      setAuthRequest( REQUEST_SUCCESS() );
     }
     catch(e){
-      setAuthRequest( REQUEST_FAILED(e.message) );
+      setCurrentUser( REQUEST_FAILED(e.message) );
     }
 }
   return (
@@ -160,14 +165,14 @@ const Header = () => {
           <div className='container'>
             <div className='left-nav'>
               <div className="img contain" id="logo">
-                <img src={logo} alt="carsome logo"/>
+                <img src={logoDark} alt="carsome logo"/>
               </div>
               {
-                currentUser&&(
+                (_isNotEmpty( currentUser.data ))&&(
                   <ul className="nav-menu">
-                    <li>
+                    {/* <li>
                       <Button to="/" looks={BTN_TRANS} color={BLACK}>Home</Button>
-                    </li>
+                    </li> */}
                     <li>
                       <Button to="/dashboard" looks={BTN_TRANS} color={BLACK}>Dashboard</Button>
                     </li>
@@ -179,12 +184,12 @@ const Header = () => {
             <div className="right-nav">
               <div className='sign-btns'>
                 {
-                  currentUser?
+                  (_isNotEmpty( currentUser.data ))?
                   (
-                    <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={authRequest.status === PENDING} >Sign out</Button>  
+                    <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={currentUser.status === PENDING} >Sign out</Button>  
                   ):(
                     <>
-                      <Button color={BLUE} id="login-btn" onClick={()=> logGoogleUser()} isLoading={authRequest.status === PENDING}>Login with Google</Button>
+                      <Button color={BLUE} id="login-btn" onClick={()=> logGoogleUser()} isLoading={currentUser.status === PENDING}>Login with Google</Button>
                     </>
                   )
                 }
@@ -206,12 +211,12 @@ const Header = () => {
             <FontAwesomeIcon icon={faXmark} />
           </div>
             {
-                currentUser&&(
+                (_isNotEmpty( currentUser.data ))&&(
                   <>
                     <ul className="menu">
-                      <li>
+                      {/* <li>
                         <Button to="/" looks={BTN_TRANS} color={BLACK} onClick={()=>setOpen(false)}>Home</Button>
-                      </li>
+                      </li> */}
                       <li>
                         <Button to="/dashboard" looks={BTN_TRANS} color={BLACK} onClick={()=>setOpen(false)}>Dashboard</Button>
                       </li>
@@ -224,14 +229,14 @@ const Header = () => {
 
           <ul className="menu-2">
                 {
-                  currentUser?
+                  (_isNotEmpty( currentUser.data ))?
                   (
                     <li>
-                      <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={authRequest.status === PENDING} >Sign out</Button>  
+                      <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={currentUser.status === PENDING} >Sign out</Button>  
                     </li>
                   ):(
                     <li>
-                      <Button color={BLUE} id="login-btn" onClick={()=> logGoogleUser()} isLoading={authRequest.status === PENDING}>Login with Google</Button>
+                      <Button color={BLUE} id="login-btn" onClick={()=> logGoogleUser()} isLoading={currentUser.status === PENDING}>Login with Google</Button>
                     </li>
                   )
                 }

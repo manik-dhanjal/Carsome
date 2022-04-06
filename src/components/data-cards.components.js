@@ -8,6 +8,7 @@ min-width:10rem;
 padding:0.8rem 2rem;
 border-radius:1.2rem;
 box-shadow: 0px 4px 4px 0px #00000040;
+background:white;
 .data-name{
   font-size:0.9em;
   font-weight:200;

@@ -131,6 +131,7 @@ export const onUserReferralsStateChangedListener = async (uid,callback) => {
 }
 
 export const onUserStateChangeListener = (uid,callback) => {
+    
     const q = query(doc(db, "users",uid));
     const unsubscribe = onSnapshot(q, (snapshot)=>{
         callback( snapshot.data() )

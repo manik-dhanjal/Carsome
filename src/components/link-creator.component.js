@@ -4,8 +4,10 @@ import Input from './input.components'
 import Button from './button.components'
 import tick from "../assets/images/tick.png"
 import { UserContext } from '../context/user.context'
-import { createShortenLink } from '../utils/firebase.utils'
+import { createShortenLink } from '../utils/url-shortner.utils'
 import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../constants/transaction.constants'
+import { BLUE, YELLOW } from '../constants/style.contstants'
+import { _isNotEmpty } from '../utils/validations.utils'
 
 
 const Style = styled.div`
@@ -14,6 +16,7 @@ min-width:10rem;
 padding:1.5rem 1.5rem;
 border-radius:1.2rem;
 box-shadow: 0px 4px 4px 0px #00000040;
+background:white;
 &>form{
     display:flex;
     justify-content:center;
@@ -51,20 +54,21 @@ box-shadow: 0px 4px 4px 0px #00000040;
     border: 1px solid #E0E0E0;
     box-sizing: border-box;
     border-radius: 5px;
-    padding:0.3rem 0.3rem;
+    padding:0.4rem 0.4rem;
     cursor:pointer;
     width:100%;
     .text-to-copy{
-        font-size:0.8em;
+        font-size:1em;
         white-space:nowrap;
         overflow:hidden;
+        color:#4b4b4b;
     }
     .indicator{
         white-space:nowrap;
         color:white;
-        font-size:0.5em;
+        font-size:0.8em;
         background:${({isCopied})=>{
-            return isCopied?"green":" #BEBEBE";
+            return isCopied?"green":BLUE;
         }};
         padding:0.3em 0.5em;
         border-radius:0.1em;
@@ -108,8 +112,8 @@ const LinkCreator = () => {
         }
         try{
             setLinkRequest( REQUEST_PENDING({isCopied:false}) )
-            const generatedLink = await createShortenLink(currentUser.uid, trimmedLink, { ref1 ,ref2 });
-            setLinkForm( defaultLinkForm );
+            const generatedLink = await createShortenLink(currentUser.data.uid, trimmedLink, { ref1 ,ref2 });
+            // setLinkForm( defaultLinkForm );
             setLinkRequest( REQUEST_SUCCESS({
                 link:generatedLink,
                 isCopied:false,
@@ -143,7 +147,7 @@ const LinkCreator = () => {
             }
         })
     }
-  if(!currentUser) return;
+  if( !_isNotEmpty( currentUser ) ) return;
   return (
       <Style className='link-creator' isCopied={linkRequest.data.isCopied}>
           <form onSubmit={handleSubmit}>
@@ -158,7 +162,7 @@ const LinkCreator = () => {
             </div>
             <Input placeholder="Refrence 1 (Optional)" onChange={handleChange} value={linkForm.ref1} name="ref1"/>
             <Input placeholder="Refrence 2 (Optional)" onChange={handleChange} value={linkForm.ref2} name="ref2"/>
-            <Button type="submit" isLoading={linkRequest.status===PENDING}>Create Link</Button>
+            <Button type="submit" isLoading={linkRequest.status===PENDING} color={YELLOW}>Create Link</Button>
           </form>
         {
             linkRequest.data.link&&

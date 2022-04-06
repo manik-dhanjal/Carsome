@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from "styled-components"
 import { Link } from 'react-router-dom'
-import { BLUE,L_BLUE, BLACK, WHITE, BTN_BORDER,BTN_FILL,BTN_TRANS } from '../constants/style.contstants'
+import { BLUE,L_BLUE, BLACK, WHITE, BTN_BORDER,BTN_FILL,BTN_TRANS,YELLOW } from '../constants/style.contstants'
 import Spinner from './loading-spinner.component'
 
 
@@ -61,18 +61,10 @@ display:inline-block;
             `
             default: return`
                 border:2px solid ${color};
-                color:${color===WHITE||color===L_BLUE?BLACK:WHITE};
+                color:${color===WHITE||color===L_BLUE||color===YELLOW?BLACK:WHITE};
                 background:${color};
                 border-radius:100px;
                 transition:0.3s ease;
-                ${
-                    !isLoading&&`
-                        &:hover{
-                            background:transparent;
-                            color:${color};
-                        }
-                    `
-                }
                 ${
                     active&&
                     `background:transparent;

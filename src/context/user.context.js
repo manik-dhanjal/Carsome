@@ -1,9 +1,11 @@
 import { createContext,useEffect,useState } from "react";
 import { REFERRALS_RESPONSE, USER_STATUS_RESPONSE } from "../constants/response.constans";
 import { createUserDocumentFromAuth, onUserStateChangeListener, onAuthStateChangedListener, onUserReferralsStateChangedListener } from "../utils/firebase.utils";
-
+import { useNavigate } from "react-router-dom";
+import { REQUEST_PENDING, REQUEST_SUCCESS } from "../constants/transaction.constants";
+import { _isNotEmpty } from "../utils/validations.utils.js"
 export const UserContext = createContext({
-    currentUser:null,
+    currentUser: REQUEST_PENDING(),
     setCurrentUser:() => null
 })
 export const ReferralsContext = createContext({
@@ -15,26 +17,29 @@ export const UserStatusContext = createContext({
     setUserStatus:() => null
 })
 export const UserProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState(null)
+    const [currentUser, setCurrentUser] = useState( REQUEST_PENDING() )
     const [userReferrals, setUserReferrals] = useState([]);
     const [userStatus, setUserStatus] = useState([]);
-    
+
+    let navigate = useNavigate();
+
     const value = {currentUser, setCurrentUser};
     const refValue = {userReferrals, setUserReferrals};
     const USValue = {userStatus, setUserStatus};
 
     useEffect(()=>{
-      const unsubscribe =  onAuthStateChangedListener((user)=>{
-            setCurrentUser(user)
-            if(user){
-                createUserDocumentFromAuth(user);
+      const unsubscribe =  onAuthStateChangedListener( async (user)=>{
+            setCurrentUser( REQUEST_SUCCESS( user||{} ) )
+            if( user ){
+                await createUserDocumentFromAuth(user);
             }
         })
     return unsubscribe;
     },[])
     useEffect( ()=>{
-        if(currentUser){
-            onUserReferralsStateChangedListener(currentUser.uid,(newDoc)=>{
+        if(_isNotEmpty( currentUser.data )){
+            console.log(currentUser)
+            onUserReferralsStateChangedListener(currentUser.data.uid,(newDoc)=>{
                 setUserReferrals((prev)=>{
                     return [
                         ...prev,
@@ -42,14 +47,15 @@ export const UserProvider = ({children}) => {
                     ]
                 })
             })
-            onUserStateChangeListener(currentUser.uid,(data)=>{
+            onUserStateChangeListener(currentUser.data.uid,(data)=>{
                     setUserStatus( USER_STATUS_RESPONSE(data) )
             })
+            navigate("/dashboard");
         }else{
             setUserReferrals([])
             setUserStatus({})
         }
-    },[currentUser])
+    },[currentUser.data,navigate])
     return (
         <UserContext.Provider value={value}>
             <ReferralsContext.Provider value={refValue}>
