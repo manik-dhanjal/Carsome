@@ -22,9 +22,5 @@ export const LINK_STATS = [
     },{
         name:"Refrence 2",
         id:"ref2"
-    },{
-        name:"Commission",
-        id:"commission",
-        dataModifier: (data) => "RM "+data
     }
 ]

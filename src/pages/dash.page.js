@@ -6,6 +6,7 @@ import { LINK_STATS } from '../constants/table-schema.constants';
 import LinkCreator from '../components/link-creator.component';
 import { ReferralsContext } from '../context/user.context';
 import { CLICKS_CALCULATOR, COMMISSION_RATE_CALCULATOR, CONVERSION_CALCULATOR, CONVERSION_RATE_CALCULATOR } from '../utils/formula.utils';
+import { CurrencyContext } from '../context/currency.context';
 
 const Styles = styled.div`
 padding-top:1rem;
@@ -119,8 +120,8 @@ padding-top:1rem;
 
 const Dashboard = () => {
   const {userReferrals} = useContext(ReferralsContext);
-  // const {userStatus} = useContext(UserStatusContext);
-
+  const {calculateExchangeRateStr} = useContext(CurrencyContext);
+  console.log(userReferrals)
   return (
     <Styles>
       <div className='container'>
@@ -129,11 +130,22 @@ const Dashboard = () => {
           <DataCards name={"Conversions"} value={ CONVERSION_CALCULATOR(userReferrals) }/>
           <DataCards name={"Conversion Rate"} value={ CONVERSION_RATE_CALCULATOR(userReferrals)+"%"}/>
           {/* <DataCards name={"Value"} value={ parseInt(userStatus.value||0) }/> */}
-          <DataCards name={"Commission"} value={"RM "+COMMISSION_RATE_CALCULATOR(userReferrals)}/>
+          <DataCards name={"Commission"} value={ calculateExchangeRateStr( COMMISSION_RATE_CALCULATOR(userReferrals) )}/>
           {/* <DataCards name={"Payment Approved"} value={ parseInt(userStatus.paymentApproved||0) }/> */}
         </div>
         <div className='section-2'>
-          <Table schema={LINK_STATS} data={userReferrals}/>
+          <Table 
+          schema={
+            [
+              ...LINK_STATS,
+              {
+                  name:"Commission",
+                  id:"commission",
+                  dataModifier: (data) => calculateExchangeRateStr( data )
+              }
+            ]} 
+            data={userReferrals}
+          />
           <LinkCreator/>
         </div>
       </div>

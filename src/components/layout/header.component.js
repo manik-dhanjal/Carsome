@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState,useContext } from 'react';
 import styled from 'styled-components'
-import logo from "../../assets/images/Logo.png"
 import logoDark from "../../assets/images/logo-dark.svg"
 import Button from '../button.components';
 import { BLACK, BLUE, BTN_BORDER, BTN_TRANS } from '../../constants/style.contstants'
@@ -11,6 +10,10 @@ import { UserContext } from '../../context/user.context';
 import { signOutUser,signInWithGooglePopup } from '../../utils/firebase.utils';
 import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../../constants/transaction.constants';
 import { _isNotEmpty } from '../../utils/validations.utils';
+import Dropdown from '../dropdown.components';
+import { MYR, currencyList } from '../../utils/exchange-rates.utils';
+import { CurrencyContext } from '../../context/currency.context';
+import { fetchExchangeRateFromMYRto } from '../../utils/exchange-rates.utils';
 
 const Style = styled.header`
 nav{
@@ -33,6 +36,7 @@ nav>.container{
     font-size:1.3em;
     cursor:pointer;
     display:none;
+    margin-left:15px;
   }
   #logo{
     height:20px;
@@ -137,6 +141,7 @@ nav>.container{
 const Header = () => {
   const [isOpen,setOpen] = useState(false);
   const {currentUser,setCurrentUser} = useContext(UserContext);
+  const {currentCurrency, setCurrentCurrency} = useContext(CurrencyContext);
 
   const signOutHandler = async () => {
     try{
@@ -159,6 +164,27 @@ const Header = () => {
       setCurrentUser( REQUEST_FAILED(e.message) );
     }
 }
+useEffect(()=>{
+  console.log(currentCurrency)
+},[currentCurrency])
+  const changeCurrencyTo = async (e) => {
+    try{
+        setCurrentCurrency((curr) => REQUEST_PENDING(curr.data) );
+        const exchangeRate = await fetchExchangeRateFromMYRto(e.value);
+        setCurrentCurrency( REQUEST_SUCCESS({
+          iso:e.value,
+          symbol:e.symbol,
+          rate:exchangeRate
+        }) );
+        return true;
+    }
+    catch(e){
+        console.log(e);
+        setCurrentCurrency((curr) => REQUEST_FAILED(e.message,curr.data))
+        return false;
+    }
+
+  }
   return (
     <Style isOpen={isOpen}>
         <nav>
@@ -182,11 +208,33 @@ const Header = () => {
 
             </div>
             <div className="right-nav">
+              {
+                (_isNotEmpty( currentUser.data ))?
+                  (
+                    <Dropdown 
+                    name="currency" 
+                    options={currencyList.map((item)=>{
+                      return {
+                        label:item.iso,
+                        value:item.iso,
+                        symbol:item.symbol
+                      }
+                    } )}
+                    defaultValue={MYR}
+                    placeholder ="Currency"
+                    handleSelect={(e)=>changeCurrencyTo(e)}
+                    isDisabled={currentCurrency.status===PENDING}
+                  />
+                  ):null
+              }
+
               <div className='sign-btns'>
                 {
                   (_isNotEmpty( currentUser.data ))?
                   (
-                    <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={currentUser.status === PENDING} >Sign out</Button>  
+                    <>
+                      <Button looks={BTN_BORDER} color={BLACK} onClick={signOutHandler} isLoading={currentUser.status === PENDING} >Sign out</Button>  
+                    </>
                   ):(
                     <>
                       <Button color={BLUE} id="login-btn" onClick={()=> logGoogleUser()} isLoading={currentUser.status === PENDING}>Login with Google</Button>
