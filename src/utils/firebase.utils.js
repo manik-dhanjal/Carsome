@@ -79,7 +79,9 @@ const provider = new GoogleAuthProvider();
 export const signOutUser = () =>{
      unsubscribeOnSignOut.forEach((unsubscribe)=>{
         unsubscribe();
+        console.log("unsubscribe")
      })
+
      signOut(auth)
 }
 

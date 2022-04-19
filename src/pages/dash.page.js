@@ -121,7 +121,7 @@ padding-top:1rem;
 const Dashboard = () => {
   const {userReferrals} = useContext(ReferralsContext);
   const {calculateExchangeRateStr} = useContext(CurrencyContext);
-  console.log(userReferrals)
+
   return (
     <Styles>
       <div className='container'>

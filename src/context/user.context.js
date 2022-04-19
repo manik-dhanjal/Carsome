@@ -37,10 +37,15 @@ export const UserProvider = ({children}) => {
     return unsubscribe;
     },[])
     useEffect( ()=>{
+        console.log(currentUser)
         if(_isNotEmpty( currentUser.data )){
-            console.log(currentUser)
             onUserReferralsStateChangedListener(currentUser.data.uid,(newDoc)=>{
+                
                 setUserReferrals((prev)=>{
+                    console.log([
+                        ...prev,
+                        REFERRALS_RESPONSE(newDoc)
+                    ])
                     return [
                         ...prev,
                         REFERRALS_RESPONSE(newDoc)

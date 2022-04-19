@@ -164,9 +164,7 @@ const Header = () => {
       setCurrentUser( REQUEST_FAILED(e.message) );
     }
 }
-useEffect(()=>{
-  console.log(currentCurrency)
-},[currentCurrency])
+
   const changeCurrencyTo = async (e) => {
     try{
         setCurrentCurrency((curr) => REQUEST_PENDING(curr.data) );
