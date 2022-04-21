@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "carsome-c8058"
-  }
+    "default": "carsome-c8058",
+    "production": "projectambassador-prod"
+  },
+  "targets": {}
 }

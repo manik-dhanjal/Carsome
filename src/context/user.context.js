@@ -37,7 +37,6 @@ export const UserProvider = ({children}) => {
     return unsubscribe;
     },[])
     useEffect( ()=>{
-        console.log(currentUser)
         if(_isNotEmpty( currentUser.data )){
             onUserReferralsStateChangedListener(currentUser.data.uid,(newDoc)=>{
                 
@@ -53,6 +52,7 @@ export const UserProvider = ({children}) => {
                 })
             })
             onUserStateChangeListener(currentUser.data.uid,(data)=>{
+                console.log(data)
                     setUserStatus( USER_STATUS_RESPONSE(data) )
             })
             navigate("/dashboard");
@@ -60,7 +60,7 @@ export const UserProvider = ({children}) => {
             setUserReferrals([])
             setUserStatus({})
         }
-    },[currentUser.data,navigate])
+    },[currentUser.data])
     return (
         <UserContext.Provider value={value}>
             <ReferralsContext.Provider value={refValue}>

@@ -9,7 +9,7 @@ import {
     signOut,
     onAuthStateChanged
 } from "firebase/auth"
-import { getFirestore, doc,getDoc,setDoc,collection,onSnapshot,query,getDocs } from "firebase/firestore"
+import { getFirestore, doc,getDoc,setDoc,collection,onSnapshot,query,getDocs,where, orderBy, limit } from "firebase/firestore"
 // import encodeUrl from "encodeurl";
 import { COMMISSION_CALCULATOR } from "./formula.utils";
 import axios from "axios"
@@ -17,14 +17,16 @@ import axios from "axios"
 
 const firebaseConfig = {
 
-  apiKey: "AIzaSyCNBQMGy8X7_my2sw_MYGXfuwsZxJYa5ag",
-  authDomain: "carsome-c8058.firebaseapp.com",
-  projectId: "carsome-c8058",
-  storageBucket: "carsome-c8058.appspot.com",
-  messagingSenderId: "402850768952",
-  appId: "1:402850768952:web:689349da7ce12db5ba5ecd",
-  measurementId: "G-HBK16W24RH"
-};
+    apiKey: "AIzaSyCk8YE7ALk4xMm8BOj0CCoAJLiMshMBzHo",
+    authDomain: "projectambassador-prod.firebaseapp.com",
+    databaseURL: "https://projectambassador-prod-default-rtdb.firebaseio.com",
+    projectId: "projectambassador-prod",
+    storageBucket: "projectambassador-prod.appspot.com",
+    messagingSenderId: "5047764515",
+    appId: "1:5047764515:web:1a7c66d2b19ecc84771396"
+  
+  };
+  
 
 // Initialize Firebase
 const unsubscribeOnSignOut = [];
@@ -132,6 +134,32 @@ export const onUserReferralsStateChangedListener = async (uid,callback) => {
     unsubscribeOnSignOut.push(unsubscribe);
 }
 
+export const fetchCommissionFromUrl = async (url) => {
+    if(!url) return {};
+    const findInUrl = [{
+        comp:"https://www.carsome.my/buy-car/",
+        key:"buy"
+    },{
+        comp:"https://www.carsome.my/sell-car/",
+        key:"sell"
+    }]
+    const keyword = findInUrl.reduce((total,curr)=>{
+        if(url.includes(curr.comp)&&!total) return curr.key;
+        return total;
+    },"")
+
+    var data = {}
+    if(keyword){
+        // limit for largest
+        const campToKeywordRef = query(collection(db, "campaign"), where("appliedTo", "==", keyword), orderBy("commission", "desc"), limit(1))
+        const docsRef =  await getDocs(campToKeywordRef);
+
+        docsRef.forEach((d)=>{
+            data = d.data()
+        })
+    }
+    return data;
+}
 export const onUserStateChangeListener = (uid,callback) => {
     
     const q = query(doc(db, "users",uid));
