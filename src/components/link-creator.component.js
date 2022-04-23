@@ -4,7 +4,7 @@ import Input from './input.components'
 import Button from './button.components'
 import tick from "../assets/images/tick.png"
 import { UserContext } from '../context/user.context'
-import { createShortenLink } from '../utils/url-shortner.utils'
+import { createShortenLink } from '../utils/firebase.utils'
 import { PENDING, REQUEST_FAILED, REQUEST_PENDING, REQUEST_SUCCESS } from '../constants/transaction.constants'
 import { BLUE, YELLOW } from '../constants/style.contstants'
 import { _isNotEmpty } from '../utils/validations.utils'

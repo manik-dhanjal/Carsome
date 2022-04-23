@@ -98,8 +98,8 @@ export const createShortenLink = async (uid,link,additionalInformation={}) => {
     const {ref1,ref2} = additionalInformation;
     const utm_content = ref1||ref2? `&utm_content=${ ( ref1? ref1 + ( ref2?",":"" ) :"" ) + (ref2? ref2 :"") }` : "";
     const encodedLink = encodeURIComponent(`${link}?utm_source=${uid}${utm_content}`);
-    const {data} = await axios.post("https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyCNBQMGy8X7_my2sw_MYGXfuwsZxJYa5ag",{
-        longDynamicLink: `https://csnow.page.link/?link=${encodedLink}`
+    const {data} = await axios.post(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${firebaseConfig.apiKey}`,{
+        longDynamicLink: `https://csome.page.link/?link=${encodedLink}`
     })
     if(!data||!data.shortLink){
         throw new Error("Didn't get shorten link")
